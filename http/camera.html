@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<head>
+</head>
+<body>
+<script>
+var updateImage = function() {
+	var dl = new Image();
+	var image = document.getElementById("cameraPhoto");
+	
+	dl.onload = function() {
+		image.src = this.src;
+		setTimeout(updateImage,1000);
+	}
+	var d = new Date();
+	dl.src = "/camera/0/photo.jpg"+d.getTime();
+}
+
+window.onload = function() {
+	updateImage();
+}
+</script>
+<img id="cameraPhoto" width="640" />
+</body>
