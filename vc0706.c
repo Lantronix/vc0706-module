@@ -47,6 +47,7 @@
 void sendCommand(int zeroBasedIndex, char cmd, char* args, uint8_t argn);
 bool cameraBuffCtrl(int zeroBasedIndex, char command);
 static bool myCBfunc(struct ltrx_http_client *client);
+void checkConfig(void*);
 uint32_t getFrameLength(int zeroBasedIndex);
 uint8_t* readPicture(int zeroBasedIndex, uint8_t n);
 bool setImageSize(int zeroBasedIndex, uint8_t size);
@@ -85,6 +86,13 @@ void vc0706_module_initialization(const struct main_external_functions *mef)
 		// Register the module so the OS does the proper initialization, like creating
 		// the module directory in the filesystem to put the embedded files
 		ltrx_module_register(&g_vc0706ModuleInfo);
+		
+		ltrx_thread_create(
+			"SetConfiguration",	// Make sure configuration is set right.
+			checkConfig,
+			NULL,
+			8000
+        ); 
 		
 		// Attach the callback to the web server. We don't need to run any more code
 		// since this module will only execute code when it receives a web request
@@ -148,6 +156,40 @@ bool myCBfunc(struct ltrx_http_client *client)
 		setImageSize(zeroBasedIndex,size);
 	}
 	return true;
+}
+
+void checkConfig(void* opaque) {
+	(void)opaque;
+	struct output_stream_to_buffer osb;
+	struct input_stream_from_const_char ifs;
+	char buffer[10];
+	char buffer2[40];
+	
+	ltrx_thread_sleep(2000);
+	static const char *xmlValue = "<?xml version=\"1.0\" standalone=\"yes\"?><!DOCTYPE configrecord [<!ELEMENT configrecord (configgroup+)><!ELEMENT configgroup (configitem+)><!ELEMENT configitem (value+)><!ELEMENT value (#PCDATA)><!ATTLIST configrecord version CDATA #IMPLIED><!ATTLIST configgroup name CDATA #IMPLIED><!ATTLIST configgroup instance CDATA #IMPLIED><!ATTLIST configitem name CDATA #IMPLIED><!ATTLIST configitem instance CDATA #IMPLIED><!ATTLIST value name CDATA #IMPLIED>]><configrecord version = \"0.1.0.1\"><configgroup name = \"Line\" instance = \"1\"><configitem name = \"Protocol\"><value>None</value></configitem><configitem name = \"Baud Rate\"><value>38400 bits per second</value></configitem></configgroup></configrecord>";	
+	
+	static const struct xml_emit_value_specification s_xevs = {
+		.type = XML_EMIT_VALUE_TYPE__CONFIGURATION,
+		.groupName = "Line",
+		.optGroupInstance = "1",
+	    .itemName = "Protocol"
+	};
+	static const struct xml_emit_value_specification s_xevs2 = {
+		.type = XML_EMIT_VALUE_TYPE__CONFIGURATION,
+		.groupName = "Line",
+		.optGroupInstance = "1",
+		.itemName = "Baud Rate"
+	};
+	ltrx_output_stream_init_to_buffer(&osb, buffer, sizeof(buffer), OUTPUT_STREAM_TO_BUFFER_MODE__ZERO_TERMINATE);
+    ltrx_xml_emit_value(&s_xevs, &osb.outStream);
+	ltrx_output_stream_init_to_buffer(&osb, buffer2, sizeof(buffer2), OUTPUT_STREAM_TO_BUFFER_MODE__ZERO_TERMINATE);
+    ltrx_xml_emit_value(&s_xevs2, &osb.outStream);
+	if(strstr(buffer,"None") == NULL || strstr(buffer2,"38400") == NULL){
+		ltrx_thread_sleep(2000);
+		TLOG(TLOG_SEVERITY_LEVEL__INFORMATIONAL,"Protocol: %s, baud: %s", buffer, buffer2);
+		ltrx_input_stream_init_from_const_char(&ifs,xmlValue);
+		ltrx_xml_import_from_stream(&ifs.inStream, NULL);
+    }
 }
 
 /* The following functions implement the protocol to talk to the VC0706 camera module.
@@ -226,13 +268,13 @@ uint8_t* readPicture(int zeroBasedIndex,uint8_t n) {
 		ltrx_line_read(zeroBasedIndex,&camerabuff,5,NULL, 200);
 		if (camerabuff[3] != 0x0) {
 			//TLOG(TLOG_SEVERITY_LEVEL__INFORMATIONAL, "Frame error");
-			ltrx_thread_sleep(100);
+			ltrx_thread_sleep(200);
 			ltrx_line_purge(zeroBasedIndex);
 			continue;
 		}
 		if ((ltrx_line_read(zeroBasedIndex,&camerabuff,n+5,NULL, 200) != n+5)) {
 			//TLOG(TLOG_SEVERITY_LEVEL__INFORMATIONAL, "Could not read buffer");
-			ltrx_thread_sleep(100);
+			ltrx_thread_sleep(200);
 			ltrx_line_purge(zeroBasedIndex);
 			continue;
 		}
