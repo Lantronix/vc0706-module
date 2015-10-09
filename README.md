@@ -9,7 +9,11 @@ This is a module for the xPico Wi-Fi which interfaces with a VC0706 camera modul
 ## How to use
 Put this source code in your c:\xpicowifi\custom\module\vc0706 directory. Create a project in c:\xpicowifi\custom\project that has vc0706 as one of the modules in the modules.make file. Build the project per the SDK instructions, and flash the firmware into an xPico Wi-Fi.
 
-Connect a VC0706 camera to the TX and RX pins of Line 1 in the xPico Wi-Fi, plus power and ground. Point your browser to <xpico wifi ip address>/embedded/vc0706/http/camera.html and you will see the camera.
+Connect a VC0706 camera to the TX and RX pins of Line 1 in the xPico Wi-Fi, plus power and ground. 
+
+![Hardware](/Camera hardware.png?raw=true)
+
+Point your browser to <xpico wifi ip address>/embedded/vc0706/http/camera.html and you will see the camera.
 
 ## What it's doing
 The entry point of the module is vc0706_module_initialization, and you can see that it does a few things:
