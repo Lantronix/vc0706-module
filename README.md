@@ -17,6 +17,7 @@ Point your browser to <xpico wifi ip address>/embedded/vc0706/http/camera.html a
 
 ## What it's doing
 The entry point of the module is vc0706_module_initialization, and you can see that it does a few things:
+
 * Registers the module
 * Makes sure that the serial port configuration is set to the parameters that the camera uses
 * Registers a callback with the HTTP server
