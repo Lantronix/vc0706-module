@@ -4,7 +4,7 @@
 This is a module for the xPico Wi-Fi which interfaces with a VC0706 camera module from Adafruit. You can find the camera here: http://www.adafruit.com/product/397
 
 ## How to video
-http://img.youtube.com/vi/qcIX7abym-8/0.jpg)](http://www.youtube.com/watch?v=qcIX7abym-8)
+[http://img.youtube.com/vi/qcIX7abym-8/0.jpg)](http://www.youtube.com/watch?v=qcIX7abym-8)
 
 ## How to use
 Put this source code in your c:\xpicowifi\custom\module\vc0706 directory. Create a project in c:\xpicowifi\custom\project that has vc0706 as one of the modules in the modules.make file. Build the project per the SDK instructions, and flash the firmware into an xPico Wi-Fi.
