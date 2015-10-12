@@ -11,7 +11,7 @@ Put this source code in your c:\xpicowifi\custom\module\vc0706 directory. Create
 
 Connect a VC0706 camera to the TX and RX pins of Line 1 in the xPico Wi-Fi, plus power and ground. 
 
-![Hardware](/CameraHardware.png?raw=true)
+![Hardware](/CameraHardware.JPG?raw=true)
 
 Point your browser to <xpico wifi ip address>/embedded/vc0706/http/camera.html and you will see the camera.
 
